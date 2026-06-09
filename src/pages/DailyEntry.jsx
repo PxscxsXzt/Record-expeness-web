@@ -176,13 +176,10 @@ function DailyEntry() {
               </thead>
               <tbody>
                 {(() => {
-                  const dailyBalances = {};
+                  let currentBalance = 0;
                   const recordsWithBalance = filteredRecords.map(r => {
-                    if (dailyBalances[r.date] === undefined) {
-                      dailyBalances[r.date] = 0;
-                    }
-                    dailyBalances[r.date] += (r.income || 0) - (r.expense || 0);
-                    return { ...r, balance: dailyBalances[r.date] };
+                    currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
+                    return { ...r, balance: currentBalance };
                   });
                   return recordsWithBalance.slice().reverse().map(record => (
                     <tr key={record.id}>
