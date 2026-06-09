@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Premium Color Palette */
+  --primary-color: #6366f1; /* Indigo 500 */
+  --primary-light: #818cf8; /* Indigo 400 */
+  --primary-dark: #4f46e5;  /* Indigo 600 */
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --surface-color: rgba(255, 255, 255, 0.95);
+  
+  --text-main: #1e293b; /* Slate 800 */
+  --text-light: #64748b; /* Slate 500 */
+  
+  --border-color: #e2e8f0; /* Slate 200 */
+  --input-bg: #f1f5f9; /* Slate 100 */
+  
+  /* Status colors */
+  --income-color: #10b981; /* Emerald 500 */
+  --income-bg: rgba(16, 185, 129, 0.1);
+  --expense-color: #f43f5e; /* Rose 500 */
+  --expense-bg: rgba(244, 63, 94, 0.1);
+  --reimburse-color: #f59e0b; /* Amber 500 */
+  --reimburse-bg: rgba(245, 158, 11, 0.1);
+  
+  --hover-color: #f8fafc;
+  
+  /* Shadows & Effects */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.3);
+  
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Sarabun', sans-serif;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Print Styles */
+@media print {
+  body {
+      background: white;
+      padding: 0;
+  }
+}
