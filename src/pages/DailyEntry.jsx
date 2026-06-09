@@ -197,7 +197,7 @@ function DailyEntry() {
                   // Filter for the selected date
                   const filteredToDisplay = recordsWithBalance.filter(r => r.date === displayDate);
 
-                  return filteredToDisplay.slice().reverse().map(record => (
+                  return filteredToDisplay.map(record => (
                     <tr key={record.id}>
                       <td>{record.date}</td>
                       <td>{record.item || '-'}</td>

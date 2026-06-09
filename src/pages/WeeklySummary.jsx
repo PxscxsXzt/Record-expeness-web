@@ -138,7 +138,7 @@ function WeeklySummary() {
                 </tr>
               </thead>
               <tbody>
-                {filteredRecords.slice().reverse().map(record => (
+                {filteredRecords.map(record => (
                     <tr key={record.id}>
                       <td>{formatDate(record.date)}</td>
                       <td>{record.item || '-'}</td>
