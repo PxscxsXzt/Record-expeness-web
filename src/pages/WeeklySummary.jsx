@@ -67,8 +67,8 @@ function WeeklySummary() {
                   <th>รายการ</th>
                   <th>รายรับ</th>
                   <th>รายจ่าย</th>
-                  <th>คงเหลือ</th>
                   <th>สถานะ</th>
+                  <th>คงเหลือ</th>
                   <th>หมายเหตุ</th>
                 </tr>
               </thead>
@@ -85,15 +85,15 @@ function WeeklySummary() {
                       <td>{record.item || '-'}</td>
                       <td className="text-success">{record.income > 0 ? formatNumber(record.income) : '-'}</td>
                       <td className="text-danger">{record.expense > 0 ? formatNumber(record.expense) : '-'}</td>
-                      <td className={record.balance >= 0 ? 'text-success' : 'text-danger'} style={{ fontWeight: '600' }}>
-                        {formatNumber(record.balance)}
-                      </td>
                       <td>
                         {record.isReimbursable && record.expense > 0 ? (
                           <span style={{ backgroundColor: 'var(--reimburse-bg)', color: 'var(--reimburse-color)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '600' }}>
                             รอเบิกคืน
                           </span>
                         ) : null}
+                      </td>
+                      <td className={record.balance >= 0 ? 'text-success' : 'text-danger'} style={{ fontWeight: '600' }}>
+                        {formatNumber(record.balance)}
                       </td>
                       <td>{record.note || '-'}</td>
                     </tr>
