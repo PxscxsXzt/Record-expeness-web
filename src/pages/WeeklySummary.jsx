@@ -1,7 +1,9 @@
+import { useState, useMemo } from 'react';
 import { useExpense } from '../context/ExpenseContext';
 
 function WeeklySummary() {
   const { records, clearRecords } = useExpense();
+  const [selectedMonth, setSelectedMonth] = useState('all');
 
   // Helper to format date
   const formatDate = (dateString) => {
@@ -11,17 +13,57 @@ function WeeklySummary() {
 
   const formatNumber = (num) => num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Group records by week (simplified to just calculating totals for all records and allowing export)
-  const totalIncome = records.reduce((sum, r) => sum + (r.income || 0), 0);
-  const totalExpense = records.reduce((sum, r) => sum + (r.expense || 0), 0);
-  const totalReimbursable = records.reduce((sum, r) => sum + (r.isReimbursable ? (r.expense || 0) : 0), 0);
+  // Extract unique months for the dropdown
+  const availableMonths = useMemo(() => {
+    const months = new Set();
+    records.forEach(r => {
+      const dateObj = new Date(r.date);
+      // Format as YYYY-MM
+      const monthStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+      months.add(monthStr);
+    });
+    return Array.from(months).sort().reverse(); // Newest first
+  }, [records]);
+
+  // Format month for display
+  const formatMonthDisplay = (monthStr) => {
+    const [year, month] = monthStr.split('-');
+    const dateObj = new Date(parseInt(year), parseInt(month) - 1, 1);
+    return dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+  };
+
+  // Filter records by selected month
+  const filteredRecords = useMemo(() => {
+    if (selectedMonth === 'all') return records;
+    return records.filter(r => {
+      const dateObj = new Date(r.date);
+      const monthStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+      return monthStr === selectedMonth;
+    });
+  }, [records, selectedMonth]);
+
+  // Calculate totals based on FILTERED records
+  const totalIncome = filteredRecords.reduce((sum, r) => sum + (r.income || 0), 0);
+  const totalExpense = filteredRecords.reduce((sum, r) => sum + (r.expense || 0), 0);
+  const totalReimbursable = filteredRecords.reduce((sum, r) => sum + (r.isReimbursable ? (r.expense || 0) : 0), 0);
   const totalBalance = totalIncome - totalExpense;
 
   return (
     <div className="page-container">
       <div className="summary-header">
         <h2>สรุปข้อมูลรายสัปดาห์ / ทั้งหมด</h2>
-        <div className="summary-actions">
+        <div className="summary-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <select 
+            className="form-control" 
+            style={{ width: 'auto', padding: '0.6rem 1rem', minWidth: '180px' }}
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(e.target.value)}
+          >
+            <option value="all">ดูข้อมูลทั้งหมด</option>
+            {availableMonths.map(m => (
+              <option key={m} value={m}>{formatMonthDisplay(m)}</option>
+            ))}
+          </select>
           <button className="btn btn-export" onClick={() => window.print()}>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -56,7 +98,7 @@ function WeeklySummary() {
 
       <div className="card">
         <h3>รายการข้อมูลทั้งหมด</h3>
-        {records.length === 0 ? (
+        {filteredRecords.length === 0 ? (
           <p className="empty-state">ยังไม่มีข้อมูล</p>
         ) : (
           <div className="table-wrapper">
@@ -75,7 +117,7 @@ function WeeklySummary() {
               <tbody>
                 {(() => {
                   const dailyBalances = {};
-                  const recordsWithBalance = records.map(r => {
+                  const recordsWithBalance = filteredRecords.map(r => {
                     if (dailyBalances[r.date] === undefined) {
                       dailyBalances[r.date] = 0;
                     }
