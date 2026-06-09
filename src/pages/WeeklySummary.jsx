@@ -118,18 +118,22 @@ function WeeklySummary() {
       </div>
 
       <div className="summary-cards">
-        <div className="stat-card">
-          <div className="stat-label">ยอดคงเหลือ</div>
-          <div className={`stat-value ${totalBalance >= 0 ? 'text-success' : 'text-danger'}`}>{formatNumber(totalBalance)} ฿</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">รายรับทั้งหมด</div>
-          <div className="stat-value text-success">{formatNumber(totalIncome)} ฿</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">รวมค่าใช้จ่ายทั้งหมด</div>
-          <div className="stat-value text-danger">{formatNumber(totalExpense)} ฿</div>
-        </div>
+        {!onlyReimbursable && (
+          <>
+            <div className="stat-card">
+              <div className="stat-label">ยอดคงเหลือ</div>
+              <div className={`stat-value ${totalBalance >= 0 ? 'text-success' : 'text-danger'}`}>{formatNumber(totalBalance)} ฿</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">รายรับทั้งหมด</div>
+              <div className="stat-value text-success">{formatNumber(totalIncome)} ฿</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">รวมค่าใช้จ่ายทั้งหมด</div>
+              <div className="stat-value text-danger">{formatNumber(totalExpense)} ฿</div>
+            </div>
+          </>
+        )}
         <div className="stat-card highlight-card">
           <div className="stat-label">รวมที่ต้องเบิก</div>
           <div className="stat-value text-warning">{formatNumber(totalReimbursable)} ฿</div>
@@ -150,7 +154,7 @@ function WeeklySummary() {
                   <th>รายรับ</th>
                   <th>รายจ่าย</th>
                   <th>สถานะ</th>
-                  <th>คงเหลือ</th>
+                  {!onlyReimbursable && <th>คงเหลือ</th>}
                   <th>หมายเหตุ</th>
                 </tr>
               </thead>
@@ -168,9 +172,11 @@ function WeeklySummary() {
                           </span>
                         ) : null}
                       </td>
-                      <td className={record.balance >= 0 ? 'text-success' : 'text-danger'} style={{ fontWeight: '600' }}>
-                        {formatNumber(record.balance)}
-                      </td>
+                      {!onlyReimbursable && (
+                        <td className={record.balance >= 0 ? 'text-success' : 'text-danger'} style={{ fontWeight: '600' }}>
+                          {formatNumber(record.balance)}
+                        </td>
+                      )}
                       <td>{record.note || '-'}</td>
                     </tr>
                   ))}
