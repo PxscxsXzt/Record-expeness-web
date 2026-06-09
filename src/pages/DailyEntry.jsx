@@ -49,6 +49,10 @@ function DailyEntry() {
 
   const formatNumber = (num) => num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  const totalIncome = records.reduce((sum, r) => sum + (r.income || 0), 0);
+  const totalExpense = records.reduce((sum, r) => sum + (r.expense || 0), 0);
+  const totalBalance = totalIncome - totalExpense;
+
   return (
     <div className="daily-entry-layout">
       <div className="card form-card">
@@ -141,7 +145,12 @@ function DailyEntry() {
       </div>
 
       <div className="card recent-card">
-        <h3>รายการล่าสุด</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h3 style={{ marginBottom: 0 }}>รายการล่าสุด</h3>
+          <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+            ยอดคงเหลือ: <span className={totalBalance >= 0 ? 'text-success' : 'text-danger'}>{formatNumber(totalBalance)} ฿</span>
+          </div>
+        </div>
         {records.length === 0 ? (
           <p className="empty-state">ยังไม่มีข้อมูล</p>
         ) : (
