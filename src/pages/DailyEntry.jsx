@@ -147,9 +147,6 @@ function DailyEntry() {
       <div className="card recent-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h3 style={{ marginBottom: 0 }}>รายการล่าสุด</h3>
-          <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>
-            ยอดคงเหลือ: <span className={totalBalance >= 0 ? 'text-success' : 'text-danger'}>{formatNumber(totalBalance)} ฿</span>
-          </div>
         </div>
         {records.length === 0 ? (
           <p className="empty-state">ยังไม่มีข้อมูล</p>
@@ -162,36 +159,47 @@ function DailyEntry() {
                   <th>รายการ</th>
                   <th>รายรับ</th>
                   <th>รายจ่าย</th>
+                  <th>คงเหลือ</th>
                   <th>สถานะ</th>
                   <th>หมายเหตุ</th>
                   <th style={{width: '50px'}}></th>
                 </tr>
               </thead>
               <tbody>
-                {records.slice().reverse().map(record => (
-                  <tr key={record.id}>
-                    <td>{record.date}</td>
-                    <td>{record.item || '-'}</td>
-                    <td className="text-success">{record.income > 0 ? formatNumber(record.income) : '-'}</td>
-                    <td className="text-danger">{record.expense > 0 ? formatNumber(record.expense) : '-'}</td>
-                    <td>
-                      {record.isReimbursable && record.expense > 0 ? (
-                        <span style={{ backgroundColor: 'var(--reimburse-bg)', color: 'var(--reimburse-color)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '600' }}>
-                          รอเบิกคืน
-                        </span>
-                      ) : null}
-                    </td>
-                    <td>{record.note || '-'}</td>
-                    <td className="text-center">
-                      <button className="btn-icon" onClick={() => deleteRecord(record.id)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {(() => {
+                  let currentBalance = 0;
+                  const recordsWithBalance = records.map(r => {
+                    currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
+                    return { ...r, balance: currentBalance };
+                  });
+                  return recordsWithBalance.slice().reverse().map(record => (
+                    <tr key={record.id}>
+                      <td>{record.date}</td>
+                      <td>{record.item || '-'}</td>
+                      <td className="text-success">{record.income > 0 ? formatNumber(record.income) : '-'}</td>
+                      <td className="text-danger">{record.expense > 0 ? formatNumber(record.expense) : '-'}</td>
+                      <td className={record.balance >= 0 ? 'text-success' : 'text-danger'} style={{ fontWeight: '600' }}>
+                        {formatNumber(record.balance)}
+                      </td>
+                      <td>
+                        {record.isReimbursable && record.expense > 0 ? (
+                          <span style={{ backgroundColor: 'var(--reimburse-bg)', color: 'var(--reimburse-color)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '600' }}>
+                            รอเบิกคืน
+                          </span>
+                        ) : null}
+                      </td>
+                      <td>{record.note || '-'}</td>
+                      <td className="text-center">
+                        <button className="btn-icon" onClick={() => deleteRecord(record.id)}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ));
+                })()}
               </tbody>
             </table>
           </div>
