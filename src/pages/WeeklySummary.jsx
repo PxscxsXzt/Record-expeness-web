@@ -159,7 +159,18 @@ function WeeklySummary() {
                 </tr>
               </thead>
               <tbody>
-                {filteredRecords.map(record => (
+                {(() => {
+                  const displayRecords = [...filteredRecords].sort((a, b) => {
+                    if (a.date > b.date) return -1;
+                    if (a.date < b.date) return 1;
+                    const aIsIncome = (a.income || 0) > 0;
+                    const bIsIncome = (b.income || 0) > 0;
+                    if (aIsIncome && !bIsIncome) return -1;
+                    if (!aIsIncome && bIsIncome) return 1;
+                    return 0;
+                  });
+
+                  return displayRecords.map(record => (
                     <tr key={record.id}>
                       <td>{formatDate(record.date)}</td>
                       <td>{record.item || '-'}</td>
@@ -179,7 +190,8 @@ function WeeklySummary() {
                       )}
                       <td>{record.note || '-'}</td>
                     </tr>
-                  ))}
+                  ));
+                })()}
               </tbody>
             </table>
           </div>
