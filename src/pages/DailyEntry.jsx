@@ -53,6 +53,15 @@ function DailyEntry() {
   const totalExpense = records.reduce((sum, r) => sum + (r.expense || 0), 0);
   const totalBalance = totalIncome - totalExpense;
 
+  const displayDate = formData.date;
+  const filteredRecords = records.filter(r => r.date === displayDate);
+
+  const formatDateDisplay = (dateString) => {
+    if (!dateString) return '';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('th-TH', options);
+  };
+
   return (
     <div className="daily-entry-layout">
       <div className="card form-card">
@@ -146,10 +155,10 @@ function DailyEntry() {
 
       <div className="card recent-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ marginBottom: 0 }}>รายการล่าสุด</h3>
+          <h3 style={{ marginBottom: 0 }}>รายการของวันที่ {formatDateDisplay(displayDate)}</h3>
         </div>
-        {records.length === 0 ? (
-          <p className="empty-state">ยังไม่มีข้อมูล</p>
+        {filteredRecords.length === 0 ? (
+          <p className="empty-state">ยังไม่มีข้อมูลสำหรับวันนี้</p>
         ) : (
           <div className="table-wrapper">
             <table className="report-table">
@@ -168,7 +177,7 @@ function DailyEntry() {
               <tbody>
                 {(() => {
                   const dailyBalances = {};
-                  const recordsWithBalance = records.map(r => {
+                  const recordsWithBalance = filteredRecords.map(r => {
                     if (dailyBalances[r.date] === undefined) {
                       dailyBalances[r.date] = 0;
                     }
