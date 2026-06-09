@@ -74,10 +74,13 @@ function WeeklySummary() {
               </thead>
               <tbody>
                 {(() => {
-                  let currentBalance = 0;
+                  const dailyBalances = {};
                   const recordsWithBalance = records.map(r => {
-                    currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
-                    return { ...r, balance: currentBalance };
+                    if (dailyBalances[r.date] === undefined) {
+                      dailyBalances[r.date] = 0;
+                    }
+                    dailyBalances[r.date] += (r.income || 0) - (r.expense || 0);
+                    return { ...r, balance: dailyBalances[r.date] };
                   });
                   return recordsWithBalance.slice().reverse().map(record => (
                     <tr key={record.id}>
