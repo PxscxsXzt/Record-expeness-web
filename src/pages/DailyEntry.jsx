@@ -176,12 +176,28 @@ function DailyEntry() {
               </thead>
               <tbody>
                 {(() => {
+                  // Sort records: by date, then Income before Expense
+                  const sortedRecords = [...records].sort((a, b) => {
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
+                    const aIsIncome = (a.income || 0) > 0;
+                    const bIsIncome = (b.income || 0) > 0;
+                    if (aIsIncome && !bIsIncome) return -1;
+                    if (!aIsIncome && bIsIncome) return 1;
+                    return 0;
+                  });
+
+                  // Calculate true running balance
                   let currentBalance = 0;
-                  const recordsWithBalance = filteredRecords.map(r => {
+                  const recordsWithBalance = sortedRecords.map(r => {
                     currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
                     return { ...r, balance: currentBalance };
                   });
-                  return recordsWithBalance.slice().reverse().map(record => (
+
+                  // Filter for the selected date
+                  const filteredToDisplay = recordsWithBalance.filter(r => r.date === displayDate);
+
+                  return filteredToDisplay.slice().reverse().map(record => (
                     <tr key={record.id}>
                       <td>{record.date}</td>
                       <td>{record.item || '-'}</td>

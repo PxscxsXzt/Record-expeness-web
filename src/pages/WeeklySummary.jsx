@@ -14,9 +14,31 @@ function WeeklySummary() {
 
   const formatNumber = (num) => num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  // Sort ALL records by date, then Income before Expense
+  const sortedRecords = useMemo(() => {
+    return [...records].sort((a, b) => {
+      if (a.date < b.date) return -1;
+      if (a.date > b.date) return 1;
+      const aIsIncome = (a.income || 0) > 0;
+      const bIsIncome = (b.income || 0) > 0;
+      if (aIsIncome && !bIsIncome) return -1;
+      if (!aIsIncome && bIsIncome) return 1;
+      return 0;
+    });
+  }, [records]);
+
+  // Map true running balance over sorted records
+  const recordsWithBalance = useMemo(() => {
+    let currentBalance = 0;
+    return sortedRecords.map(r => {
+      currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
+      return { ...r, balance: currentBalance };
+    });
+  }, [sortedRecords]);
+
   // Filter records by date range
   const filteredRecords = useMemo(() => {
-    return records.filter(r => {
+    return recordsWithBalance.filter(r => {
       let startMatch = true;
       let endMatch = true;
       if (startDate) {
@@ -27,13 +49,18 @@ function WeeklySummary() {
       }
       return startMatch && endMatch;
     });
-  }, [records, startDate, endDate]);
+  }, [recordsWithBalance, startDate, endDate]);
 
   // Calculate totals based on FILTERED records
   const totalIncome = filteredRecords.reduce((sum, r) => sum + (r.income || 0), 0);
   const totalExpense = filteredRecords.reduce((sum, r) => sum + (r.expense || 0), 0);
   const totalReimbursable = filteredRecords.reduce((sum, r) => sum + (r.isReimbursable ? (r.expense || 0) : 0), 0);
-  const totalBalance = totalIncome - totalExpense;
+  
+  // Total balance should be the final true balance of the filtered period (i.e. the last record's balance)
+  // If no records in filter, use the last absolute balance if we wanted, but 0 is safer if empty.
+  const totalBalance = filteredRecords.length > 0 
+    ? filteredRecords[filteredRecords.length - 1].balance 
+    : (recordsWithBalance.length > 0 ? recordsWithBalance[recordsWithBalance.length - 1].balance : 0);
 
   return (
     <div className="page-container">
@@ -111,13 +138,7 @@ function WeeklySummary() {
                 </tr>
               </thead>
               <tbody>
-                {(() => {
-                  let currentBalance = 0;
-                  const recordsWithBalance = filteredRecords.map(r => {
-                    currentBalance = currentBalance + (r.income || 0) - (r.expense || 0);
-                    return { ...r, balance: currentBalance };
-                  });
-                  return recordsWithBalance.slice().reverse().map(record => (
+                {filteredRecords.slice().reverse().map(record => (
                     <tr key={record.id}>
                       <td>{formatDate(record.date)}</td>
                       <td>{record.item || '-'}</td>
