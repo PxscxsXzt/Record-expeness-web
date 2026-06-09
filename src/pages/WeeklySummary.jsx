@@ -161,8 +161,8 @@ function WeeklySummary() {
               <tbody>
                 {(() => {
                   const displayRecords = [...filteredRecords].sort((a, b) => {
-                    if (a.date > b.date) return -1;
-                    if (a.date < b.date) return 1;
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
                     const aIsIncome = (a.income || 0) > 0;
                     const bIsIncome = (b.income || 0) > 0;
                     if (aIsIncome && !bIsIncome) return -1;

@@ -197,10 +197,10 @@ function DailyEntry() {
                   // Filter for the selected date
                   const filteredToDisplay = recordsWithBalance.filter(r => r.date === displayDate);
 
-                  // Sort for display: Newest date first, but within same date Income first
+                  // Sort for display: Oldest date first, but within same date Income first
                   const displayRecords = [...filteredToDisplay].sort((a, b) => {
-                    if (a.date > b.date) return -1;
-                    if (a.date < b.date) return 1;
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
                     const aIsIncome = (a.income || 0) > 0;
                     const bIsIncome = (b.income || 0) > 0;
                     if (aIsIncome && !bIsIncome) return -1;
