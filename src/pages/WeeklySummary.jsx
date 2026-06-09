@@ -5,6 +5,7 @@ function WeeklySummary() {
   const { records, clearRecords } = useExpense();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [onlyReimbursable, setOnlyReimbursable] = useState(false);
 
   // Helper to format date
   const formatDate = (dateString) => {
@@ -36,20 +37,24 @@ function WeeklySummary() {
     });
   }, [sortedRecords]);
 
-  // Filter records by date range
+  // Filter records by date range and reimbursable status
   const filteredRecords = useMemo(() => {
     return recordsWithBalance.filter(r => {
       let startMatch = true;
       let endMatch = true;
+      let reimburseMatch = true;
       if (startDate) {
         startMatch = r.date >= startDate;
       }
       if (endDate) {
         endMatch = r.date <= endDate;
       }
-      return startMatch && endMatch;
+      if (onlyReimbursable) {
+        reimburseMatch = r.isReimbursable && r.expense > 0;
+      }
+      return startMatch && endMatch && reimburseMatch;
     });
-  }, [recordsWithBalance, startDate, endDate]);
+  }, [recordsWithBalance, startDate, endDate, onlyReimbursable]);
 
   // Calculate totals based on FILTERED records
   const totalIncome = filteredRecords.reduce((sum, r) => sum + (r.income || 0), 0);
@@ -86,6 +91,18 @@ function WeeklySummary() {
               value={endDate} 
               onChange={(e) => setEndDate(e.target.value)}
             />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '0.5rem' }}>
+            <input 
+              type="checkbox" 
+              id="onlyReimbursable"
+              checked={onlyReimbursable}
+              onChange={(e) => setOnlyReimbursable(e.target.checked)}
+              style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+            />
+            <label htmlFor="onlyReimbursable" style={{ fontSize: '0.9rem', fontWeight: '500', cursor: 'pointer', color: 'var(--reimburse-color)', margin: 0 }}>
+              เฉพาะที่ต้องเบิก
+            </label>
           </div>
           <button className="btn btn-export" onClick={() => window.print()}>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
