@@ -156,8 +156,7 @@ function WeeklySummary() {
                       </td>
                       <td>{record.note || '-'}</td>
                     </tr>
-                  ));
-                })()}
+                  ))}
               </tbody>
             </table>
           </div>
